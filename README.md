@@ -65,3 +65,7 @@ const result = await this.ctx.curl('https://api.weixin.qq.com/sns/jscode2session
 // 返回的数据是流的格式，需要转换成字符，再进行处理，示例代码如下：
     // let json=JSON.parse(result.data.toString());
 ```
+
+## 使用了leancloud作为数据库
+
+['https://www.leancloud.cn/'](https://www.leancloud.cn/)
