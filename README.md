@@ -68,4 +68,4 @@ const result = await this.ctx.curl('https://api.weixin.qq.com/sns/jscode2session
 
 ## 使用了leancloud作为数据库
 
-['https://www.leancloud.cn/'](https://www.leancloud.cn/)
+[https://www.leancloud.cn/](https://www.leancloud.cn/)
