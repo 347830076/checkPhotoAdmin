@@ -55,7 +55,7 @@ class HomeController extends Controller {
     checkPhoto.set('data', data);
     checkPhoto.set('userInfo', userInfo);
     checkPhoto.set('my_openid', my_openid);
-    checkPhoto.set('p_openid', p_openid);
+    checkPhoto.set('p_openid', p_openid || '');
     // 将对象保存到云端
     checkPhoto.save().then((checkPhoto) => {
       // 成功保存之后，执行其他逻辑
@@ -73,7 +73,7 @@ class HomeController extends Controller {
     query.equalTo(filed, value);
     return new Promise((resolve, reject) => {
       query.find().then((res) => {
-        console.log('找到', res);
+        // console.log('找到', res);
         resolve(res)
       }, (err) => {
         console.log('没有找到', err);
