@@ -40,7 +40,10 @@ class IndexController extends Controller {
     // });
     // console.log('result =>', result.data);
   }
-
+  async getMsg(){
+    const { ctx } = this;
+    console.log(ctx);
+  }
 }
 
 module.exports = IndexController;
