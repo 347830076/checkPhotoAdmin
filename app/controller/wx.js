@@ -59,6 +59,7 @@ class IndexController extends Controller {
             limit: '1mb',
             encoding: ctx.request.charset || 'utf-8'
         });
+        console.log('xml =>', xml);
         // 将xml数据转化为json格式的数据
         let result = await xmlTool.parseXML(xml)
         console.log('result =>', result);
@@ -69,7 +70,15 @@ class IndexController extends Controller {
         if (formatted.MsgType === 'text') {
             return answer.text(formatted)
         } else {
-            return 'success'
+            return `
+            <xml>
+                <ToUserName><![CDATA[toUser]]></ToUserName>
+                <FromUserName><![CDATA[fromUser]]></FromUserName>
+                <CreateTime>12345678</CreateTime>
+                <MsgType><![CDATA[text]]></MsgType>
+                <Content><![CDATA[你好]]></Content>
+            </xml>
+            `
         }
 }
 }
