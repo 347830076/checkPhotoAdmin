@@ -2,6 +2,10 @@
 const sha1 = require('sha1');
 const Controller = require('egg').Controller;
 
+const xmlTool = require('../utils/xmlTool') 
+const answer = require('../utils/answer')
+const getRawBody = require('raw-body')
+
 class IndexController extends Controller {
 
   // 登录
@@ -43,7 +47,29 @@ class IndexController extends Controller {
   async getMsg(){
     const { ctx } = this;
     console.log(ctx);
+    const res = await handleMessage(ctx)
+    console.log('res =>', res);
+    ctx.body = res;
   }
+  
+
+   async handleMessage (ctx) {
+        let xml = await getRawBody(ctx.req, {
+            length: ctx.request.length,
+            limit: '1mb',
+            encoding: ctx.request.charset || 'utf-8'
+        });
+        // 将xml数据转化为json格式的数据
+        let result = await xmlTool.parseXML(xml)
+        // 格式化数据
+        let formatted = await xmlTool.formatMessage(result.xml)
+        // 判断消息的类型，如果是文本消息则返回相同的内容
+        if (formatted.MsgType === 'text') {
+            return answer.text(formatted)
+        } else {
+            return 'success'
+        }
+}
 }
 
 module.exports = IndexController;
