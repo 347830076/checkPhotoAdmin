@@ -61,8 +61,10 @@ class IndexController extends Controller {
         });
         // 将xml数据转化为json格式的数据
         let result = await xmlTool.parseXML(xml)
+        console.log('result =>', result);
         // 格式化数据
         let formatted = await xmlTool.formatMessage(result.xml)
+        console.log('formatted =>', formatted);
         // 判断消息的类型，如果是文本消息则返回相同的内容
         if (formatted.MsgType === 'text') {
             return answer.text(formatted)
