@@ -47,7 +47,7 @@ class IndexController extends Controller {
   async getMsg(){
     const { ctx } = this;
     console.log(ctx);
-    const res = await handleMessage(ctx)
+    const res = await this.handleMessage(ctx)
     console.log('res =>', res);
     ctx.body = res;
   }
