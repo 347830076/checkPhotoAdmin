@@ -15,11 +15,12 @@ module.exports = appInfo => {
   // 允许跨域
   config.security = {
     csrf: {
-      enable: false,
+      enable: true,
     },
   };
 
   config.cors = {
+    enable: true,
     origin: '*',
     allowMethods: 'GET,POST,PUT,DELETE',
   };

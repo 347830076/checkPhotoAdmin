@@ -11,4 +11,6 @@ module.exports = app => {
   router.post('/getModelDetail', controller.home.getModelDetail);
   router.get('/wx', controller.wx.index);
   router.post('/wx', controller.wx.getMsg);
+  router.get('/auth', controller.wx.auth);
+  router.get('/authGetUserInfo', controller.wx.authGetUserInfo);
 };

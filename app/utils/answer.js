@@ -27,7 +27,19 @@ const answer = {
             xmlContent += "<MsgType><![CDATA[text]]></MsgType>";
             xmlContent += "<Content><![CDATA["+ content +"]]></Content></xml>";
         return xmlContent;
-    }
+    },
+    imgMsg: function(toUser, fromUser, media_id){
+        let xmlContent =  `<xml>
+            <ToUserName><![CDATA[${toUser}]]></ToUserName>
+            <FromUserName><![CDATA[${fromUser}]]></FromUserName>
+            <CreateTime>${new Date().getTime()}</CreateTime>
+            <MsgType><![CDATA[image]]></MsgType>
+            <Image>
+            <MediaId><![CDATA[${media_id}]]></MediaId>
+            </Image>
+        </xml>`
+        return xmlContent;
+    },
 }
 
 

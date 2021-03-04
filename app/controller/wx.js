@@ -1,10 +1,20 @@
 'use strict';
 const sha1 = require('sha1');
+const request = require('request')
+const fs = require('fs')
 const Controller = require('egg').Controller;
 
 const xmlTool = require('../utils/xmlTool') 
 const answer = require('../utils/answer')
 const getRawBody = require('raw-body')
+
+// // 团结大家族
+// const appid = 'wx3a32b0c50a7ed7e4'
+// const appsecret = '2a8a026305cf0c74ec11aa1d86d3c176'
+
+// 测试公众号
+const appid = 'wx266bd1a737fed816'
+const appsecret = 'c22f760dc95071924ccea9e2c7a05891'
 
 class IndexController extends Controller {
 
@@ -28,6 +38,87 @@ class IndexController extends Controller {
     ctx.body = (sha === signature) ? echostr + '' : 'failed';  //比较并返回结果
   }
 
+  // 微信授权
+  auth () {
+    const { ctx } = this;
+    // 第一步：用户同意授权，获取code
+    let router = 'get_wx_access_token';
+    // 这是编码后的地址
+    let return_uri = 'http%3a%2f%2fwww.wanggege.cn';  
+    let scope = 'snsapi_userinfo';
+    ctx.body = {
+      url: `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${return_uri}&response_type=code&scope=${scope}&state=1#wechat_redirect`
+    }
+  }
+
+  async authGetUserInfo () {
+    const { ctx } = this;
+    // 第二步：通过code换取网页授权access_token
+    let code = ctx.query.code;
+    console.log('code =>', code);
+    const res = await request.get(
+        {   
+            url:'https://api.weixin.qq.com/sns/oauth2/access_token?appid='+appid+'&secret='+appsecret+'&code='+code+'&grant_type=authorization_code',
+        },
+        function(error, response, body){
+          // console.log('error', error);
+          // console.log('response', response);
+          // console.log('body', body);
+            if(response.statusCode == 200){
+                
+                // 第三步：拉取用户信息(需scope为 snsapi_userinfo)
+                //console.log(JSON.parse(body));
+                let data = JSON.parse(body);
+                console.log('data=>', data);
+                let access_token = data.access_token || '42_WwH9tn8Luf2xBJAZvcxvRvL0rdz4zKPsM6AQSRRiBw_nNNySX241wwZ2Agao0ce2Eyc_uxd7HYd4KXvyzveHgyBoK2FAF64x6ObTKJsH0ck';
+                let openid = data.openid || 'o47-V5ukybkD0AwmrTtnF4yQ3bQ8';
+                if (access_token) {
+                    request.get(
+                      {
+                          url:'https://api.weixin.qq.com/sns/userinfo?access_token='+access_token+'&openid='+openid+'&lang=zh_CN',
+                      },
+                      function(error, response, body){
+                          if(response.statusCode == 200){
+                              // 第四步：根据获取的用户信息进行对应操作
+                              let userinfo = JSON.parse(body);
+                              console.log(JSON.parse(body));
+                              
+                              if (userinfo.nickname) {
+                                // 小测试，实际应用中，可以由此创建一个帐户
+                                    ctx.body = "\
+                                    <h1>"+userinfo.nickname+" 的个人信息</h1>\
+                                    <p><img src='"+userinfo.headimgurl+"' /></p>\
+                                    <p>"+userinfo.city+"，"+userinfo.province+"，"+userinfo.country+"</p>\
+                                "
+                              }
+                              else {
+                                console.log('获取用户信息失败');
+                                ctx.body = {
+                                  msg: '获取用户信息失败'
+                                }
+                              }
+                              
+                              
+                          }else{
+                              console.log('response.statusCode =======', response.statusCode);
+                          }
+                      }
+                  );
+                }
+                else {
+                  console.log('获取access_token失败');
+                  ctx.body = {
+                    msg: '获取access_token失败'
+                  }
+                }
+            }else{
+                console.log('response.statusCode', response.statusCode);
+            }
+        }
+    );
+    // ctx.body = {}
+  }
+
 
   // 获取access_token
   async getToken() {
@@ -39,8 +130,8 @@ class IndexController extends Controller {
       },
       data:{
         grant_type: 'client_credential',
-        appid: 'wx3a32b0c50a7ed7e4',
-        secret: '2a8a026305cf0c74ec11aa1d86d3c176'
+        appid,
+        secret: appsecret
       },
       dataType: 'json'
     })
@@ -92,16 +183,50 @@ class IndexController extends Controller {
 
         const token = await this.getToken()
 
-        await this.getUserInfo(token, formatted.FromUserName)
+        const userInfo =  await this.getUserInfo(token, formatted.FromUserName)
 
         console.log('formatted =>', formatted);
-        // 判断消息的类型，如果是文本消息则返回相同的内容
+        // 判断消息的类型，如果是文本消息
         if (formatted.MsgType !== 'text') {
             return answer.text(formatted)
         } else {
-            return answer.txtMsg(formatted.FromUserName,formatted.ToUserName,  '欢迎你的留言，我会尽快查看回复')
+            return answer.txtMsg(formatted.FromUserName,formatted.ToUserName,  `欢迎你,${userInfo.data.nickname}的留言，我会尽快查看回复`)
         }
   }
+}
+// 素材上传获取 media_id
+// type 媒体文件类型，分别有图片（image）、语音（voice）、视频（video）和缩略图（thumb）
+async function uploadFile (ctx, accessToken, urlPath, type) {
+  return  new Promise(async (resolve, reject) => {
+    let form = { //构造表单
+      media: fs.createReadStream(urlPath)
+    }
+    console.log('fs.createReadStream(urlPath)========', fs.createReadStream(urlPath));
+    let url = 'https://api.weixin.qq.com/cgi-bin/media/upload?access_token=' + accessToken + '&type=' + type
+
+    // const result = await ctx.curl(url, {
+    //   method: 'POST',
+    //   // rejectUnauthorized: false, //如果想忽略证书
+    //   // // cert: fs.readFileSync(cerPaht),//对证书格式有要求 如果接口的url是https的，可能需要证书
+    //   // headers: {//自定义header
+    //   //   "Accept": "*/*",
+    //   //   "Content-Type": "application/json"
+    //   // },
+    //   data: {
+    //     media: fs.createReadStream(urlPath)
+    //   },
+    //   dataType: 'json'
+    // });
+    // console.log('result ====>', result);
+    // resolve(JSON.parse(result).media_id)
+    // console.log('request ==>', request);
+    request.post(url, form, function optionalCallback(err, httpResponse, body){
+      // console.log('err =>', err);
+      // console.log('httpResponse =>', httpResponse);
+      console.log('body =>', body);
+    })
+   
+  })
 }
 
 module.exports = IndexController;
