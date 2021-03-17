@@ -38,6 +38,34 @@ class IndexController extends Controller {
     ctx.body = (sha === signature) ? echostr + '' : 'failed';  //比较并返回结果
   }
 
+  // 获取sdkConfig
+  async getSdkConfig () {
+    const { ctx } = this;
+    const access_token = await this.getToken()
+    const jsapiTicket = await this.getJsApiTicket(access_token)
+    const noncestr = "123456"
+    const url = 'http:www.wanggege.cn'
+    // 精确到秒
+    const timestamp = Math.floor(Date.now() / 1000);
+    ctx.body  = {
+      debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+      appId: appid, // 必填，公众号的唯一标识
+      timestamp: timestamp, // 必填，生成签名的时间戳
+      nonceStr: noncestr, // 必填，生成签名的随机串
+      signature: sha1('jsapi_ticket=' + jsapiTicket + '&noncestr=' + noncestr + '&timestamp=' + timestamp + '&url=' + url),// 必填，签名
+      jsApiList: [
+        'chooseImage',
+        'updateAppMessageShareData',
+        'updateTimelineShareData',
+        'onMenuShareWeibo',
+        'chooseImage',
+        'previewImage',
+        'uploadImage',
+        'downloadImage'
+      ] // 必填，需要使用的JS接口列表
+    }
+  }
+
   // 微信授权
   auth () {
     const { ctx } = this;
@@ -117,6 +145,20 @@ class IndexController extends Controller {
         }
     );
     // ctx.body = {}
+  }
+
+  // 获取jsapi_ticket(有效期7200秒)
+  async getJsApiTicket(accessToken) {
+    const res = await this.ctx.curl('https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token='+ accessToken +'&type=jsapi',{
+      method: 'GET',
+      headers: {
+        "Accept": "*/*",
+        "Content-Type": "application/json"
+      },
+      dataType: 'json'
+    })
+    console.log('getJsApiTicket', res)
+    return res.data.ticket
   }
 
 

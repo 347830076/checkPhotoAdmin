@@ -13,4 +13,5 @@ module.exports = app => {
   router.post('/wx', controller.wx.getMsg);
   router.get('/auth', controller.wx.auth);
   router.get('/authGetUserInfo', controller.wx.authGetUserInfo);
+  router.get('/getSdkConfig', controller.wx.getSdkConfig);
 };
