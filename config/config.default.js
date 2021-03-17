@@ -12,17 +12,19 @@ module.exports = appInfo => {
    **/
   const config = exports = {};
 
-  // 允许跨域
   config.security = {
     csrf: {
-      enable: true,
+      enable: false,
+      ignoreJSON: true,
     },
+    // domainWhiteList: ['http://www.wanggege.cn', 'http://localhost:8083'], //配置白名单
   };
 
+  // 允许跨域
   config.cors = {
-    enable: true,
-    origin: '*',
-    allowMethods: 'GET,POST,PUT,DELETE',
+    origin: '*', //允许所有跨域访问，注释掉则允许上面 白名单 访问
+    // credentials: true, // 允许跨域请求携带cookies
+    allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH'
   };
 
   // leancloud
