@@ -41,10 +41,12 @@ class IndexController extends Controller {
   // 获取sdkConfig
   async getSdkConfig () {
     const { ctx } = this;
+    console.log('url =>', ctx.request.header.referer);
+
     const access_token = await this.getToken()
     const jsapiTicket = await this.getJsApiTicket(access_token)
     const noncestr = "123456"
-    const url = 'http:www.wanggege.cn'
+    const url = ctx.request.header.referer
     // 精确到秒
     const timestamp = Math.floor(Date.now() / 1000);
     ctx.body  = {
@@ -157,7 +159,7 @@ class IndexController extends Controller {
       },
       dataType: 'json'
     })
-    console.log('getJsApiTicket', res)
+    // console.log('getJsApiTicket', res)
     return res.data.ticket
   }
 
@@ -177,7 +179,7 @@ class IndexController extends Controller {
       },
       dataType: 'json'
     })
-    console.log('res.access_token', res)
+    // console.log('res.access_token', res)
     return res.data.access_token
   }
   
