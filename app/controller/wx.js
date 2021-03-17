@@ -9,12 +9,12 @@ const answer = require('../utils/answer')
 const getRawBody = require('raw-body')
 
 // // 团结大家族
-// const appid = 'wx3a32b0c50a7ed7e4'
-// const appsecret = '2a8a026305cf0c74ec11aa1d86d3c176'
+const appid = 'wx9b2ffcec2d41074c'
+const appsecret = 'fd76e76491be85c688b9fbbb1dbb85b6'
 
 // 测试公众号
-const appid = 'wx266bd1a737fed816'
-const appsecret = 'c22f760dc95071924ccea9e2c7a05891'
+// const appid = 'wx266bd1a737fed816'
+// const appsecret = 'c22f760dc95071924ccea9e2c7a05891'
 
 class IndexController extends Controller {
 
