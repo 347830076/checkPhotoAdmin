@@ -19,17 +19,17 @@ class HomeController extends Controller {
       method: 'GET',
       // rejectUnauthorized: false, //如果想忽略证书
       // cert: fs.readFileSync(cerPaht),//对证书格式有要求 如果接口的url是https的，可能需要证书
-      headers: {//自定义header
-        "Accept": "*/*",
-        "Content-Type": "application/json"
+      headers: {// 自定义header
+        Accept: '*/*',
+        'Content-Type': 'application/json',
       },
-      data: {//发送的数据
+      data: {// 发送的数据
         appid: 'wx3a32b0c50a7ed7e4', // 小程序 appId
         secret: '2a8a026305cf0c74ec11aa1d86d3c176', // 小程序 appSecret
         js_code: code, // 登录时获取的 code
         grant_type: 'authorization_code', // 授权类型，此处只需填写 authorization_code
       },
-      dataType: 'json'
+      dataType: 'json',
     });
     // console.log('result =>', result.data);
     // 根据openid去判断是否保存过
@@ -57,13 +57,13 @@ class HomeController extends Controller {
     checkPhoto.set('my_openid', my_openid);
     checkPhoto.set('p_openid', p_openid || '');
     // 将对象保存到云端
-    checkPhoto.save().then((checkPhoto) => {
+    checkPhoto.save().then(checkPhoto => {
       // 成功保存之后，执行其他逻辑
       console.log(`保存成功。objectId：${checkPhoto.id}`);
-    }, (error) => {
+    }, error => {
       // 异常处理
       console.log('error =>', error);
-    })
+    });
   }
 
   // 通过单一字段值，查询获取列表
@@ -71,18 +71,18 @@ class HomeController extends Controller {
     const { ctx } = this;
     const query = new ctx.AV.Query('checkPhoto');
     query.equalTo(filed, value);
-    return new Promise((resolve, reject) => {
-      query.find().then((res) => {
+    return new Promise(resolve => {
+      query.find().then(res => {
         // console.log('找到', res);
-        resolve(res)
-      }, (err) => {
+        resolve(res);
+      }, err => {
         console.log('没有找到', err);
-        resolve(false)
-      }).catch((err) => {
+        resolve(false);
+      }).catch(err => {
         console.log('catch =>', err);
       });
-    })
-  } 
+    });
+  }
 
   // 获取好友列表
   async getFriendList() {
